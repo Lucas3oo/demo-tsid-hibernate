@@ -1,0 +1,112 @@
+plugins {
+  id 'io.micronaut.application' version '3.7.0'
+  id 'io.micronaut.test-resources' version '3.7.0'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE' apply true
+  id 'se.solrike.conventions.java-conventions' version '1.0.0-beta.2'
+}
+
+version = '0.1'
+group = 'com.example.tsid'
+
+// versions
+def mapStructVersion = '1.4.1.Final'
+def micronautVersion = '3.8.4'
+
+
+dependencyManagement {
+  dependencies {
+    dependency 'com.mysql:mysql-connector-j:8.0.31'
+
+//    dependency 'ch.qos.logback:logback-classic:1.3.5'
+//    dependency 'org.slf4j:slf4j-api:2.0.4'
+
+    imports {
+      mavenBom "io.micronaut:micronaut-bom:$micronautVersion"
+    }
+    dependency 'javax.inject:javax.inject:1'
+    dependency 'net.logstash.logback:logstash-logback-encoder:6.5'
+    dependency "org.mapstruct:mapstruct:$mapStructVersion"
+    dependency "org.mapstruct:mapstruct-processor:$mapStructVersion"
+
+    // test dependeces
+    dependency 'org.assertj:assertj-core:3.23.1'
+    imports {
+      mavenBom 'org.junit:junit-bom:5.9.1'
+    }
+  }
+}
+
+
+dependencies {
+  annotationProcessor 'io.micronaut.data:micronaut-data-processor'
+  annotationProcessor 'io.micronaut:micronaut-http-validation'
+  annotationProcessor 'org.mapstruct:mapstruct-processor'
+  implementation 'io.micrometer:micrometer-core'
+  implementation 'io.micronaut.aws:micronaut-aws-sdk-v2'
+  implementation 'io.micronaut.beanvalidation:micronaut-hibernate-validator'
+  implementation 'io.micronaut.data:micronaut-data-hibernate-jpa'
+  implementation 'io.micronaut.sql:micronaut-hibernate-jpa'
+  implementation 'io.micronaut.sql:micronaut-jdbc-hikari'
+  implementation 'io.micronaut:micronaut-http-client'
+  implementation 'io.micronaut:micronaut-jackson-databind'
+  implementation 'io.micronaut:micronaut-runtime'
+  implementation 'io.micronaut:micronaut-validation'
+  implementation 'jakarta.annotation:jakarta.annotation-api'
+  implementation 'javax.inject:javax.inject'
+  implementation 'org.mapstruct:mapstruct'
+  runtimeOnly 'ch.qos.logback:logback-classic'
+  runtimeOnly 'com.h2database:h2'
+  runtimeOnly 'com.mysql:mysql-connector-j'
+  runtimeOnly 'net.logstash.logback:logstash-logback-encoder'
+  testImplementation 'org.assertj:assertj-core'
+  testImplementation 'org.mockito:mockito-core'
+}
+
+
+
+def applicationClass = 'com.example.tsid.Application'
+application {
+  mainClass.set(applicationClass)
+}
+
+java {
+  sourceCompatibility = JavaVersion.toVersion('17')
+  targetCompatibility = JavaVersion.toVersion('17')
+}
+
+graalvmNative.toolchainDetection = false
+
+
+// package all dependecies inside the JAR as separate JARs. Much cleaner compared to a fat/shadow JAR.
+// And shadow jar is suppose to be used when you actually need to shadow a third party lib with your own version.
+jar {
+  into('lib') {
+    from configurations.runtimeClasspath
+  }
+  manifest {
+    def classpath = configurations.runtimeClasspath.copyRecursive().resolve().collect { file ->
+      'lib/${file.name}'
+    }.sort().join(' ')
+    attributes 'Main-Class': applicationClass
+    attributes 'Class-Path': classpath
+  }
+}
+
+
+micronaut {
+  version(micronautVersion)
+
+  runtime('netty')
+  testRuntime('junit5')
+  processing {
+    incremental(true)
+    annotations('com.example.tsid.*')
+  }
+}
+
+
+
+wrapper {
+  gradleVersion = '7.5'
+}
+

@@ -1,0 +1,19 @@
+micronaut:
+  application:
+    name: demoTsidHibernate
+datasources:
+  default:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    db-type: mysql
+    dialect: MYSQL
+jpa:
+  default:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+jpa.default.properties.hibernate.hbm2ddl.auto: update
+netty:
+  default:
+    allocator:
+      max-order: 3
