@@ -1,18 +1,56 @@
 micronaut:
   application:
-    name: demoTsidHibernate
+    name: TsIdDemoApplication
+    
+    
 datasources:
   default:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    db-type: mysql
-    dialect: MYSQL
+    url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ''
+    driverClassName: org.h2.Driver
+    schema-generate: CREATE_DROP
+    dialect: H2
+
+    
+#datasources:
+#  default:
+#    url: jdbc:mysql://localhost:3306/database1
+#    username: myAppDbUser
+#    password: ''
+#    driverClassName: com.mysql.cj.jdbc.Driver
+#    schema-generate: CREATE
+#    db-type: mysql
+#    dialect: org.hibernate.dialect.MySQL8Dialect
+##    #hikari
+#    leakDetectionThreshold: 20000 # Warn when a connections is kept out of the pool for more than 20 seconds.
+#    pool-name: hikari-read-write
+#    maximum-pool-size: 10
+#    read-only: false
+#    data-source-properties:
+#      cachePrepStmts: true
+#      enabledTLSProtocols: TLSv1.2
+#      prepStmtCacheSize: 250
+#      prepStmtCacheSqlLimit: 2048
+#      requireSSL: true
+#      useSSL: true
+#      useServerPrepStmts: true
+#      verifyServerCertificate: false
+
+
 jpa:
   default:
+    entity-scan:
+      packages: com.example.tsid.book
     properties:
       hibernate:
         hbm2ddl:
           auto: update
-jpa.default.properties.hibernate.hbm2ddl.auto: update
+        show_sql: false
+        format_sql: true
+    
+    
+
 netty:
   default:
     allocator:
