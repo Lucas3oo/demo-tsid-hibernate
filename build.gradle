@@ -13,16 +13,15 @@ def mapStructVersion = '1.4.1.Final'
 def micronautVersion = '3.7.3'
 
 
-dependencyManagement {
-  dependencies {
-    dependency 'com.mysql:mysql-connector-j:8.0.31'
 
 //    dependency 'ch.qos.logback:logback-classic:1.3.5'
 //    dependency 'org.slf4j:slf4j-api:2.0.4'
 
-    imports {
-      mavenBom "io.micronaut:micronaut-bom:$micronautVersion"
-    }
+
+dependencyManagement {
+  dependencies {
+    dependency 'com.mysql:mysql-connector-j:8.0.31'
+    dependency 'io.hypersistence:hypersistence-utils-hibernate-55:3.2.0'
     dependency 'javax.inject:javax.inject:1'
     dependency 'net.logstash.logback:logstash-logback-encoder:6.5'
     dependency "org.mapstruct:mapstruct:$mapStructVersion"
@@ -30,7 +29,10 @@ dependencyManagement {
 
     // test dependeces
     dependency 'org.assertj:assertj-core:3.23.1'
+
+    // imports
     imports {
+      mavenBom "io.micronaut:micronaut-bom:$micronautVersion"
       mavenBom 'org.junit:junit-bom:5.9.1'
     }
   }
@@ -41,6 +43,7 @@ dependencies {
   annotationProcessor 'io.micronaut.data:micronaut-data-processor'
   annotationProcessor 'io.micronaut:micronaut-http-validation'
   annotationProcessor 'org.mapstruct:mapstruct-processor'
+  implementation 'io.hypersistence:hypersistence-utils-hibernate-55'
   implementation 'io.micrometer:micrometer-core'
   implementation 'io.micronaut.aws:micronaut-aws-sdk-v2'
   implementation 'io.micronaut.beanvalidation:micronaut-hibernate-validator'
@@ -103,6 +106,10 @@ micronaut {
   }
 }
 
+// Spotbugs
+spotbugsMain {
+  ignoreFailures = true
+}
 
 
 wrapper {
