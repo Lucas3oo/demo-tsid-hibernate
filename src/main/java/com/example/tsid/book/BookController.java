@@ -15,6 +15,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.retry.annotation.Retryable;
 import io.micronaut.transaction.annotation.ReadOnly;
 import io.micronaut.validation.Validated;
 
@@ -32,6 +33,7 @@ public class BookController {
 
   @Post()
   @Transactional
+  @Retryable(attempts = "2")
   public Long add(@Body @Valid BookDto book) {
     sLogger.debug("in add method");
     BookEntity entity = mMapper.convertToEntity(book);

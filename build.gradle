@@ -45,7 +45,6 @@ dependencies {
   annotationProcessor 'org.mapstruct:mapstruct-processor'
   implementation 'io.hypersistence:hypersistence-utils-hibernate-55'
   implementation 'io.micrometer:micrometer-core'
-  implementation 'io.micronaut.aws:micronaut-aws-sdk-v2'
   implementation 'io.micronaut.beanvalidation:micronaut-hibernate-validator'
   implementation 'io.micronaut.data:micronaut-data-hibernate-jpa'
   implementation 'io.micronaut.sql:micronaut-hibernate-jpa'
@@ -61,6 +60,7 @@ dependencies {
   runtimeOnly 'com.h2database:h2' // should be for test only
   runtimeOnly 'com.mysql:mysql-connector-j'
   runtimeOnly 'net.logstash.logback:logstash-logback-encoder'
+  testImplementation 'io.micronaut.test:micronaut-test-junit5'
   testImplementation 'org.assertj:assertj-core'
   testImplementation 'org.mockito:mockito-core'
 }
@@ -88,7 +88,7 @@ jar {
   }
   manifest {
     def classpath = configurations.runtimeClasspath.copyRecursive().resolve().collect { file ->
-      'lib/${file.name}'
+      "lib/${file.name}"
     }.sort().join(' ')
     attributes 'Main-Class': applicationClass
     attributes 'Class-Path': classpath
