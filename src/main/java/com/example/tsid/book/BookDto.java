@@ -6,7 +6,7 @@ import io.micronaut.core.annotation.Introspected;
 @Introspected
 public class BookDto {
 
-  private Integer mId;
+  private String mId;
   private String mDescription;
 
   public BookDto() {
@@ -17,17 +17,17 @@ public class BookDto {
     mDescription = description;
   }
 
-  public BookDto(Integer id, String description) {
+  public BookDto(String id, String description) {
     super();
     mId = id;
     mDescription = description;
   }
 
-  public void setId(Integer id) {
+  public void setId(String id) {
     mId = id;
   }
 
-  public Integer getId() {
+  public String getId() {
     return mId;
   }
 

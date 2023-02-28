@@ -24,6 +24,7 @@ dependencyManagement {
     dependency 'io.hypersistence:hypersistence-utils-hibernate-55:3.2.0'
     dependency 'javax.inject:javax.inject:1'
     dependency 'net.logstash.logback:logstash-logback-encoder:6.5'
+    dependency 'org.apache.commons:commons-lang3:3.12.0'
     dependency "org.mapstruct:mapstruct:$mapStructVersion"
     dependency "org.mapstruct:mapstruct-processor:$mapStructVersion"
 
@@ -55,14 +56,15 @@ dependencies {
   implementation 'io.micronaut:micronaut-validation'
   implementation 'jakarta.annotation:jakarta.annotation-api'
   implementation 'javax.inject:javax.inject'
+  implementation 'org.apache.commons:commons-lang3'
   implementation 'org.mapstruct:mapstruct'
   runtimeOnly 'ch.qos.logback:logback-classic'
-  runtimeOnly 'com.h2database:h2' // should be for test only
   runtimeOnly 'com.mysql:mysql-connector-j'
   runtimeOnly 'net.logstash.logback:logstash-logback-encoder'
   testImplementation 'io.micronaut.test:micronaut-test-junit5'
   testImplementation 'org.assertj:assertj-core'
   testImplementation 'org.mockito:mockito-core'
+  testRuntimeOnly 'com.h2database:h2' // should be for test only
 }
 
 
@@ -78,22 +80,6 @@ java {
 }
 
 graalvmNative.toolchainDetection = false
-
-
-// package all dependecies inside the JAR as separate JARs. Much cleaner compared to a fat/shadow JAR.
-// And shadow jar is suppose to be used when you actually need to shadow a third party lib with your own version.
-jar {
-  into('lib') {
-    from configurations.runtimeClasspath
-  }
-  manifest {
-    def classpath = configurations.runtimeClasspath.copyRecursive().resolve().collect { file ->
-      "lib/${file.name}"
-    }.sort().join(' ')
-    attributes 'Main-Class': applicationClass
-    attributes 'Class-Path': classpath
-  }
-}
 
 
 micronaut {

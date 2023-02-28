@@ -7,6 +7,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.math.NumberUtils;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +17,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Put;
 import io.micronaut.retry.annotation.Retryable;
 import io.micronaut.transaction.annotation.ReadOnly;
 import io.micronaut.validation.Validated;
@@ -31,14 +34,13 @@ public class BookController {
   @Inject
   private BookMapper mMapper;
 
-  @Post()
+  @Post
   @Transactional
-  @Retryable(attempts = "2")
+  // retry in case the TSID generated already exists i the DB. The retry will generate a new TSID.
+  @Retryable(attempts = "1", includes = ConstraintViolationException.class)
   public Long add(@Body @Valid BookDto book) {
     sLogger.debug("in add method");
-    BookEntity entity = mMapper.convertToEntity(book);
-    // set id to null to ensure that it will be a new book we are adding.
-    entity.setId(null);
+    BookEntity entity = mMapper.createNewEntity(book);
     Long id = mRepository.save(entity).getId();
 
     return id;
@@ -70,7 +72,18 @@ public class BookController {
   @Get("/{id}")
   @ReadOnly
   public Optional<BookDto> getById(@PathVariable Long id) {
+    sLogger.debug("in getById method, id: {}", id);
     return mRepository.retrieveById(id);
+  }
+
+  @Put("/{id}")
+  @Transactional
+  public void update(@PathVariable Long id, @Body @Valid BookDto book) {
+    sLogger.debug("in update method, id: {}", id);
+    if (!id.equals(NumberUtils.createLong(book.getId()))) {
+      throw new IllegalArgumentException("Id in path and id in DTO are not the same.");
+    }
+    mRepository.findById(id).ifPresent(e -> mMapper.updateEntity(book, e));
   }
 
 }
